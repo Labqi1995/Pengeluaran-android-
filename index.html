@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catatan Pengeluaran</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            padding: 15px;
+        }
+        h2 {
+            text-align: center;
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 6px 0;
+            font-size: 16px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+            background: white;
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+        .total {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Catatan Pengeluaran</h2>
+
+<input type="date" id="tanggal">
+<input type="text" id="keterangan" placeholder="Keterangan">
+<input type="number" id="jumlah" placeholder="Jumlah (Rp)">
+<button onclick="tambah()">Tambah</button>
+
+<table>
+    <thead>
+        <tr>
+            <th>Tgl</th>
+            <th>Keterangan</th>
+            <th>Rp</th>
+        </tr>
+    </thead>
+    <tbody id="list"></tbody>
+</table>
+
+<div class="total" id="total">Total: Rp 0</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem("data")) || [];
+
+function render() {
+    let list = document.getElementById("list");
+    list.innerHTML = "";
+    let total = 0;
+
+    data.forEach(d => {
+        list.innerHTML += `
+        <tr>
+            <td>${d.tgl}</td>
+            <td>${d.ket}</td>
+            <td>${d.jml}</td>
+        </tr>`;
+        total += d.jml;
+    });
+
+    document.getElementById("total").innerText =
+        "Total: Rp " + total.toLocaleString();
+}
+
+function tambah() {
+    let tgl = tanggal.value;
+    let ket = keterangan.value;
+    let jml = parseInt(jumlah.value);
+
+    if (!tgl || !ket || !jml) {
+        alert("Lengkapi data!");
+        return;
+    }
+
+    data.push({ tgl, ket, jml });
+    localStorage.setItem("data", JSON.stringify(data));
+    render();
+
+    tanggal.value = "";
+    keterangan.value = "";
+    jumlah.value = "";
+}
+
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js");
+}
+
+render();
+</script>
+
+</body>
+</html>
