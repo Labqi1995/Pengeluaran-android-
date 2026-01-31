@@ -5,21 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Catatan Pengeluaran</title>
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#4CAF50">
-
 <style>
     body {
         font-family: Arial, sans-serif;
         background: #f2f2f2;
         padding: 15px;
         display: flex;
-        justify-content: center; /* center horizontal */
+        justify-content: center;
     }
 
     .container {
         width: 100%;
-        max-width: 500px; /* biar rapi di tengah */
+        max-width: 600px;
     }
 
     h2 {
@@ -61,6 +58,17 @@
         color: white;
     }
 
+    .aksi button {
+        width: auto;
+        padding: 5px 8px;
+        margin: 0 2px;
+        font-size: 12px;
+    }
+
+    .hapus {
+        background: #e74c3c;
+    }
+
     .total {
         margin-top: 10px;
         font-weight: bold;
@@ -82,7 +90,7 @@
 
 <input type="date" id="tanggal">
 
-<select id="kategori">
+<select id="kategori" onchange="updateJenis()">
     <option value="">Pilih Kategori</option>
     <option>Uang Masuk</option>
     <option>Uang Keluar</option>
@@ -90,21 +98,12 @@
 
 <select id="jenis">
     <option value="">Pilih Jenis Transaksi</option>
-    <option>Jajan</option>
-    <option>Dapur</option>
-    <option>Tagihan</option>
-    <option>Anak</option>
-    <option>Orang Tua</option>
-    <option>Transport</option>
-    <option>Kebutuhan & Hiburan</option>
-    <option>Nabung</option>
-    <option>Other</option>
 </select>
 
 <input type="number" id="jumlah" placeholder="Jumlah (Rp)">
-
 <input type="text" id="keterangan" placeholder="Keterangan">
-<button onclick="tambah()">Tambah</button>
+
+<button onclick="tambah()" id="btnSimpan">Tambah</button>
 
 <table>
     <thead>
@@ -115,6 +114,7 @@
             <th>Jenis</th>
             <th>Nominal</th>
             <th>Keterangan</th>
+            <th>Aksi</th>
         </tr>
     </thead>
     <tbody id="list"></tbody>
@@ -126,24 +126,53 @@
 
 <script>
 let data = JSON.parse(localStorage.getItem("data")) || [];
+let editIndex = -1; // -1 = mode tambah, >=0 = mode edit
+
+function updateJenis(selectedValue = "") {
+    const kategori = document.getElementById("kategori").value;
+    const jenisSelect = document.getElementById("jenis");
+
+    jenisSelect.innerHTML = '<option value="">Pilih Jenis Transaksi</option>';
+
+    let opsi = [];
+
+    if (kategori === "Uang Masuk") {
+        opsi = ["Gaji", "Other"];
+    } else if (kategori === "Uang Keluar") {
+        opsi = [
+            "Jajan","Dapur","Tagihan","Anak","Orang Tua",
+            "Transport","Kebutuhan & Hiburan","Nabung","Other"
+        ];
+    }
+
+    opsi.forEach(teks => {
+        let opt = document.createElement("option");
+        opt.value = teks;
+        opt.textContent = teks;
+        if (teks === selectedValue) opt.selected = true;
+        jenisSelect.appendChild(opt);
+    });
+}
 
 function render() {
     let list = document.getElementById("list");
     list.innerHTML = "";
     let total = 0;
 
-    data.forEach(d => {
+    data.forEach((d, i) => {
         let row = document.createElement("tr");
-
         row.innerHTML = `
             <td>${d.user}</td>
             <td>${d.tgl}</td>
             <td>${d.kat}</td>
             <td>${d.jenis}</td>
-            <td>${d.jml.toLocaleString()}</td>
+            <td>${d.jml.toLocaleString("id-ID")}</td>
             <td>${d.ket}</td>
+            <td class="aksi">
+                <button onclick="editData(${i})">Edit</button>
+                <button class="hapus" onclick="hapusData(${i})">Hapus</button>
+            </td>
         `;
-
         list.appendChild(row);
         total += d.jml;
     });
@@ -165,33 +194,58 @@ function tambah() {
         return;
     }
 
-    data.push({
-        tgl: tgl,
-        user: usr,
-        ket: ket,
-        kat: kat,
-        jenis: jns,
-        jml: jml
-    });
+    let obj = { user: usr, tgl, kat, jenis: jns, jml, ket };
+
+    if (editIndex === -1) {
+        data.push(obj);            // tambah baru
+    } else {
+        data[editIndex] = obj;     // update data lama
+        editIndex = -1;
+        document.getElementById("btnSimpan").innerText = "Tambah";
+    }
 
     localStorage.setItem("data", JSON.stringify(data));
     render();
+    resetForm();
+}
 
-    // reset input
+function editData(i) {
+    let d = data[i];
+    editIndex = i;
+
+    document.getElementById("user").value = d.user;
+    document.getElementById("tanggal").value = d.tgl;
+    document.getElementById("kategori").value = d.kat;
+
+    updateJenis(d.jenis); // isi jenis sesuai kategori lalu pilih nilainya
+
+    document.getElementById("jumlah").value = d.jml;
+    document.getElementById("keterangan").value = d.ket;
+
+    document.getElementById("btnSimpan").innerText = "Simpan Perubahan";
+}
+
+function hapusData(i) {
+    if (confirm("Hapus transaksi ini?")) {
+        data.splice(i, 1);
+        localStorage.setItem("data", JSON.stringify(data));
+        render();
+        resetForm();
+    }
+}
+
+function resetForm() {
     document.getElementById("user").value = "";
     document.getElementById("tanggal").value = "";
     document.getElementById("kategori").value = "";
-    document.getElementById("jenis").value = "";
+    document.getElementById("jenis").innerHTML =
+        '<option value="">Pilih Jenis Transaksi</option>';
     document.getElementById("jumlah").value = "";
     document.getElementById("keterangan").value = "";
+    editIndex = -1;
+    document.getElementById("btnSimpan").innerText = "Tambah";
 }
 
-// daftar service worker (opsional PWA)
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js");
-}
-
-// tampilkan data saat pertama kali dibuka
 render();
 </script>
 
