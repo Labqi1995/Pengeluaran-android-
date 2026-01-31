@@ -17,7 +17,7 @@
         h2 {
             text-align: center;
         }
-        input, button {
+        input, select, button {
             width: 100%;
             padding: 12px;
             margin: 6px 0;
@@ -51,7 +51,32 @@
 <h2>Catatan Pengeluaran</h2>
 
 <input type="date" id="tanggal">
+
+<select id="user">
+    <option value="">Pilih User</option>
+    <option>Iqbal</option>
+    <option>Admin</option>
+    <option>Kasir</option>
+</select>
+
 <input type="text" id="keterangan" placeholder="Keterangan">
+
+<select id="kategori">
+    <option value="">Pilih Kategori</option>
+    <option>Makan</option>
+    <option>Transport</option>
+    <option>Belanja</option>
+    <option>Lainnya</option>
+</select>
+
+<select id="jenis">
+    <option value="">Pilih Jenis Pembayaran</option>
+    <option>Tunai</option>
+    <option>Transfer</option>
+    <option>Debit</option>
+    <option>QRIS</option>
+</select>
+
 <input type="number" id="jumlah" placeholder="Jumlah (Rp)">
 <button onclick="tambah()">Tambah</button>
 
@@ -59,7 +84,10 @@
     <thead>
         <tr>
             <th>Tgl</th>
+            <th>User</th>
             <th>Keterangan</th>
+            <th>Kategori</th>
+            <th>Jenis</th>
             <th>Rp</th>
         </tr>
     </thead>
@@ -80,8 +108,11 @@ function render() {
         list.innerHTML += `
         <tr>
             <td>${d.tgl}</td>
+            <td>${d.user}</td>
             <td>${d.ket}</td>
-            <td>${d.jml}</td>
+            <td>${d.kat}</td>
+            <td>${d.jenis}</td>
+            <td>${d.jml.toLocaleString()}</td>
         </tr>`;
         total += d.jml;
     });
@@ -92,20 +123,26 @@ function render() {
 
 function tambah() {
     let tgl = tanggal.value;
+    let usr = document.getElementById("user").value;
     let ket = keterangan.value;
+    let kat = document.getElementById("kategori").value;
+    let jns = document.getElementById("jenis").value;
     let jml = parseInt(jumlah.value);
 
-    if (!tgl || !ket || !jml) {
+    if (!tgl || !usr || !ket || !kat || !jns || !jml) {
         alert("Lengkapi data!");
         return;
     }
 
-    data.push({ tgl, ket, jml });
+    data.push({ tgl, user: usr, ket, kat, jenis: jns, jml });
     localStorage.setItem("data", JSON.stringify(data));
     render();
 
     tanggal.value = "";
+    document.getElementById("user").value = "";
     keterangan.value = "";
+    document.getElementById("kategori").value = "";
+    document.getElementById("jenis").value = "";
     jumlah.value = "";
 }
 
