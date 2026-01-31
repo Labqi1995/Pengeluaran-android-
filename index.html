@@ -77,26 +77,28 @@
 <select id="user">
     <option value="">Pilih User</option>
     <option>Iqbal</option>
-    <option>Admin</option>
-    <option>Kasir</option>
+    <option>Gita</option>
 </select>
 
 <input type="date" id="tanggal">
 
 <select id="kategori">
     <option value="">Pilih Kategori</option>
-    <option>Makan</option>
-    <option>Transport</option>
-    <option>Belanja</option>
-    <option>Lainnya</option>
+    <option>Uang Masuk</option>
+    <option>Uang Keluar</option>
 </select>
 
 <select id="jenis">
-    <option value="">Pilih Jenis Pembayaran</option>
-    <option>Tunai</option>
-    <option>Transfer</option>
-    <option>Debit</option>
-    <option>QRIS</option>
+    <option value="">Pilih Jenis Transaksi</option>
+    <option>Jajan</option>
+    <option>Dapur</option>
+    <option>Tagihan</option>
+    <option>Anak</option>
+    <option>Orang Tua</option>
+    <option>Transport</option>
+    <option>Kebutuhan & Hiburan</option>
+    <option>Nabung</option>
+    <option>Other</option>
 </select>
 
 <input type="number" id="jumlah" placeholder="Jumlah (Rp)">
@@ -111,7 +113,7 @@
             <th>Tgl</th>
             <th>Kategori</th>
             <th>Jenis</th>
-            <th>Rp</th>
+            <th>Nominal</th>
             <th>Keterangan</th>
         </tr>
     </thead>
@@ -134,12 +136,12 @@ function render() {
         let row = document.createElement("tr");
 
         row.innerHTML = `
-            <td>${d.tgl}</td>
             <td>${d.user}</td>
-            <td>${d.ket}</td>
+            <td>${d.tgl}</td>
             <td>${d.kat}</td>
             <td>${d.jenis}</td>
             <td>${d.jml.toLocaleString()}</td>
+            <td>${d.ket}</td>
         `;
 
         list.appendChild(row);
@@ -176,12 +178,12 @@ function tambah() {
     render();
 
     // reset input
-    document.getElementById("tanggal").value = "";
     document.getElementById("user").value = "";
-    document.getElementById("keterangan").value = "";
+    document.getElementById("tanggal").value = "";
     document.getElementById("kategori").value = "";
     document.getElementById("jenis").value = "";
     document.getElementById("jumlah").value = "";
+    document.getElementById("keterangan").value = "";
 }
 
 // daftar service worker (opsional PWA)
