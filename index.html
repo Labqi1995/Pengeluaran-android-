@@ -151,14 +151,14 @@ function render() {
 }
 
 function tambah() {
-    let tgl = document.getElementById("tanggal").value;
     let usr = document.getElementById("user").value;
-    let ket = document.getElementById("keterangan").value;
+    let tgl = document.getElementById("tanggal").value;
     let kat = document.getElementById("kategori").value;
     let jns = document.getElementById("jenis").value;
     let jml = parseInt(document.getElementById("jumlah").value);
+    let ket = document.getElementById("keterangan").value;
 
-    if (!tgl || !usr || !ket || !kat || !jns || !jml) {
+    if (!usr || !tgl || !kat || !jns || !jml || !ket) {
         alert("Lengkapi data!");
         return;
     }
