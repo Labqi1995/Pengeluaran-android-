@@ -1,52 +1,76 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catatan Pengeluaran</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catatan Pengeluaran</title>
 
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#4CAF50">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4CAF50">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
-            padding: 15px;
-        }
-        h2 {
-            text-align: center;
-        }
-        input, select, button {
-            width: 100%;
-            padding: 12px;
-            margin: 6px 0;
-            font-size: 16px;
-        }
-        button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-        table {
-            width: 100%;
-            margin-top: 10px;
-            border-collapse: collapse;
-            background: white;
-        }
-        th, td {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-            text-align: center;
-        }
-        .total {
-            margin-top: 10px;
-            font-weight: bold;
-        }
-    </style>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+        padding: 15px;
+        display: flex;
+        justify-content: center; /* center horizontal */
+    }
+
+    .container {
+        width: 100%;
+        max-width: 500px; /* biar rapi di tengah */
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    input, select, button {
+        width: 100%;
+        padding: 12px;
+        margin: 6px 0;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    button {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    table {
+        width: 100%;
+        margin-top: 10px;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    th, td {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    th {
+        background: #4CAF50;
+        color: white;
+    }
+
+    .total {
+        margin-top: 10px;
+        font-weight: bold;
+        text-align: center;
+    }
+</style>
 </head>
 <body>
+
+<div class="container">
 
 <h2>Catatan Pengeluaran</h2>
 
@@ -96,6 +120,8 @@
 
 <div class="total" id="total">Total: Rp 0</div>
 
+</div>
+
 <script>
 let data = JSON.parse(localStorage.getItem("data")) || [];
 
@@ -105,51 +131,65 @@ function render() {
     let total = 0;
 
     data.forEach(d => {
-        list.innerHTML += `
-        <tr>
+        let row = document.createElement("tr");
+
+        row.innerHTML = `
             <td>${d.tgl}</td>
             <td>${d.user}</td>
             <td>${d.ket}</td>
             <td>${d.kat}</td>
             <td>${d.jenis}</td>
             <td>${d.jml.toLocaleString()}</td>
-        </tr>`;
+        `;
+
+        list.appendChild(row);
         total += d.jml;
     });
 
     document.getElementById("total").innerText =
-        "Total: Rp " + total.toLocaleString();
+        "Total: Rp " + total.toLocaleString("id-ID");
 }
 
 function tambah() {
-    let tgl = tanggal.value;
+    let tgl = document.getElementById("tanggal").value;
     let usr = document.getElementById("user").value;
-    let ket = keterangan.value;
+    let ket = document.getElementById("keterangan").value;
     let kat = document.getElementById("kategori").value;
     let jns = document.getElementById("jenis").value;
-    let jml = parseInt(jumlah.value);
+    let jml = parseInt(document.getElementById("jumlah").value);
 
     if (!tgl || !usr || !ket || !kat || !jns || !jml) {
         alert("Lengkapi data!");
         return;
     }
 
-    data.push({ tgl, user: usr, ket, kat, jenis: jns, jml });
+    data.push({
+        tgl: tgl,
+        user: usr,
+        ket: ket,
+        kat: kat,
+        jenis: jns,
+        jml: jml
+    });
+
     localStorage.setItem("data", JSON.stringify(data));
     render();
 
-    tanggal.value = "";
+    // reset input
+    document.getElementById("tanggal").value = "";
     document.getElementById("user").value = "";
-    keterangan.value = "";
+    document.getElementById("keterangan").value = "";
     document.getElementById("kategori").value = "";
     document.getElementById("jenis").value = "";
-    jumlah.value = "";
+    document.getElementById("jumlah").value = "";
 }
 
+// daftar service worker (opsional PWA)
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js");
 }
 
+// tampilkan data saat pertama kali dibuka
 render();
 </script>
 
