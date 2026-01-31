@@ -174,12 +174,19 @@ function render() {
             </td>
         `;
         list.appendChild(row);
-        total += d.jml;
+
+        // INI BAGIAN PENTINGNYA
+        if (d.kat === "Uang Masuk") {
+            total += d.jml;
+        } else if (d.kat === "Uang Keluar") {
+            total -= d.jml;
+        }
     });
 
     document.getElementById("total").innerText =
-        "Total: Rp " + total.toLocaleString("id-ID");
+        "Saldo: Rp " + total.toLocaleString("id-ID");
 }
+
 
 function tambah() {
     let usr = document.getElementById("user").value;
